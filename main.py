@@ -27,7 +27,7 @@ class WhatsAppMessageSender:
         # Create title label for "Send to Group" tab
         self.group_title_label = tk.Label(self.main_frame, text="Send a Message to a Group", font=("Helvetica", 20, "bold"))
         self.group_title_label.pack()
-        
+
         # Create buttons for options
         self.group_button = tk.Button(self.main_frame, text="Send to Group", command=self.send_to_group, width=20, height=2)
         self.group_button.pack(pady=10)
@@ -52,10 +52,8 @@ class WhatsAppMessageSender:
         if not self.group_id:
             return
 
-        # Prompt user for message
-        self.message_text = simpledialog.askstring("Input", "Enter Message:")
-        if not self.message_text:
-            return
+        # Prompt user for message using a Text widget
+        self.message_text = self.create_multiline_input("Enter Message:")
 
         # Prompt user for send time
         self.send_time = simpledialog.askstring("Input", "Enter Time (HH:MM):")
@@ -70,10 +68,8 @@ class WhatsAppMessageSender:
         if not contact_number:
             return
 
-        # Prompt user for message
-        self.message_text = simpledialog.askstring("Input", "Enter Message:")
-        if not self.message_text:
-            return
+        # Prompt user for message using a Text widget
+        self.message_text = self.create_multiline_input("Enter Message:")
 
         # Prompt user for send time
         self.send_time = simpledialog.askstring("Input", "Enter Time (HH:MM):")
@@ -81,6 +77,24 @@ class WhatsAppMessageSender:
             return
 
         self.send_once_to_person(contact_number)
+
+    def create_multiline_input(self, prompt):
+        input_window = tk.Toplevel(self.root)
+        input_window.title(prompt)
+        
+        input_text = tk.Text(input_window, wrap='word', width=40, height=5)
+        input_text.pack(pady=10)
+        
+        ok_button = tk.Button(input_window, text="OK", command=lambda: self.set_input_text(input_text, input_window))
+        ok_button.pack(pady=5)
+
+        self.root.wait_window(input_window)
+
+        return self.input_text
+
+    def set_input_text(self, input_text_widget, input_window):
+        self.input_text = input_text_widget.get("1.0", "end-1c")
+        input_window.destroy()
 
     def send_once(self):
         try:
@@ -105,8 +119,8 @@ class WhatsAppMessageSender:
             self.root.after(int(delay_seconds * 1000) + 2000, lambda: pyautogui.press('enter'))
             self.root.after(int(delay_seconds * 1000) + 4000, lambda: pyautogui.click())
 
-            # Add an additional delay before sending the message
-            self.root.after(int(delay_seconds * 1000) + 6000, self.send_message_delay)
+            # Add an additional delay before going to the next functionality
+            self.root.after(int(delay_seconds * 1000) + 6000, self.next_functionality)
 
             messagebox.showinfo("done", f"message timed to be sent at {send_datetime}")
 
@@ -136,18 +150,17 @@ class WhatsAppMessageSender:
             self.root.after(int(delay_seconds * 1000) + 2000, lambda: pyautogui.press('enter'))
             self.root.after(int(delay_seconds * 1000) + 4000, lambda: pyautogui.click())
 
-            # Add an additional delay before sending the message
-            self.root.after(int(delay_seconds * 1000) + 6000, self.send_message_delay)
+            # Add an additional delay before going to the next functionality
+            self.root.after(int(delay_seconds * 1000) + 6000, self.next_functionality)
 
             messagebox.showinfo("done", f"message timed to be sent to {contact_number} at {send_datetime} :D")
 
         except ValueError:
-            messagebox.showinfo("problem", "problem with the time. Please enter time with the HH:MM format.")
+            messagebox.showinfo("problem", "the is a no no problem with the time. Please enter time with the HH:MM format.")
 
-    def send_message_delay(self):
-        # Simulate pressing Enter and clicking to send the message
-        pyautogui.press('enter')
-        pyautogui.click()
+    def next_functionality(self):
+        # Add code for any additional functionality after sending the message
+        pass
 
 # Instantiate the WhatsAppMessageSender class
 app = WhatsAppMessageSender()
